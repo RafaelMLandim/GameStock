@@ -1,0 +1,9 @@
+Musica tema do app
+
+tema.mp3 = "Sergio's Magic Dustbin", de Kevin MacLeod (incompetech.com),
+licenca Creative Commons Attribution 4.0 (CC BY 4.0).
+A licenca exige o credito ao autor: ele aparece no rodape do app (src/App.tsx).
+
+Para trocar a musica, substitua tema.mp3 por outro arquivo com o mesmo nome
+(e atualize o credito no rodape). Sem o arquivo, o app toca a trilha de
+faroeste propria, gerada no navegador.

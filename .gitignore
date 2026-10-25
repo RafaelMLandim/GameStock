@@ -1,0 +1,6 @@
+node_modules
+dist
+# banco do jogo: senhas, sessões, fotos e backups ficam só no servidor
+data
+# senhas das contas de teste
+logins-de-teste.txt
