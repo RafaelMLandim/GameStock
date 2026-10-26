@@ -2,10 +2,10 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import { randomBytes, randomInt, scryptSync, timingSafeEqual } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BADGE_TYPES, initialState } from '../src/data';
-import { normalizeState, reducer, uid, type Action } from '../src/game';
+import { BADGE_TYPES, initialState } from '../src/data.js';
+import { normalizeState, reducer, uid, type Action } from '../src/game.js';
 import type { GameState, Role, User } from '../src/types';
-import { fileStore, postgresStore, type Snapshot } from './store';
+import { fileStore, postgresStore, type Snapshot } from './store.js';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DATA_DIR = process.env.DATA_DIR ?? path.join(ROOT, 'data');

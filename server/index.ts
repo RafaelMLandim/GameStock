@@ -1,7 +1,7 @@
 import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, app } from './app';
+import { ROOT, app } from './app.js';
 
 // Servidor de verdade (PC, Fly.io...). Na Vercel quem chama o app é api/index.ts.
 const PORT = Number(process.env.PORT ?? 3001);

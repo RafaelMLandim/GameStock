@@ -1,4 +1,4 @@
-import { normalizeLook } from './avatar';
+import { normalizeLook } from './avatar.js';
 import {
   AVATARS,
   BADGE_POINTS,
@@ -17,7 +17,7 @@ import {
   TERRITORIES,
   WIN_POINTS,
   initialState,
-} from './data';
+} from './data.js';
 import type { Badge, BadgeType, CardId, GameState, LogEntry, Mission, MissionCategory, Player, StoreItem, StoreOrder } from './types';
 
 export type PlayerProfile = Pick<Player, 'realName' | 'codename' | 'avatar' | 'look' | 'color' | 'backdrop'>;

@@ -1,4 +1,4 @@
-import { makeLook } from './avatar';
+import { makeLook } from './avatar.js';
 import type { Avatar, BadgeType, GameState, Mission, MissionCategory, MissionGame, SpecialCard, StoreItem, Territory, WordClue } from './types';
 
 /** Personagens: cada um traz um visual inicial que o jogador pode personalizar. */
