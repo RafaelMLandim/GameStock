@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import BadgesTab from './components/Badges';
+import InstallApp from './components/InstallApp';
 import Login from './components/Login';
 import MapView from './components/MapView';
 import Players from './components/Players';
@@ -47,6 +48,7 @@ function Game() {
             {isAdmin ? '⭐ Gestão' : '🤠'} <b>{myPlayer?.codename ?? user.realName}</b> <span className="muted">({user.username})</span>
           </span>
           <SoundToggles />
+          <InstallApp compact />
           <button className="btn small" onClick={logout}>
             Sair
           </button>

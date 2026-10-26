@@ -2898,16 +2898,36 @@ button {
 }
 
 .install-app p {
-  margin: 0;
+  margin: 8px 0 0;
   padding: 10px 12px;
   border: 2px dashed var(--border);
   border-radius: 10px;
-  background: rgba(253, 243, 217, 0.92);
+  background: rgba(253, 243, 217, 0.96);
   font-size: 14px;
+  text-align: left;
 }
 
 .install-app .btn {
   width: 100%;
+}
+
+/* Versão pequena na barra do topo: o passo a passo abre como um balão embaixo do botão */
+.install-app.compact {
+  z-index: 45;
+  max-width: none;
+  margin: 0;
+}
+
+.install-app.compact .btn {
+  width: auto;
+}
+
+.install-app.compact p {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: min(280px, calc(100vw - 32px));
+  box-shadow: 0 6px 18px rgba(43, 26, 14, 0.25);
 }
 
 /* Celular: o minijogo ocupa a tela inteira. Cabeçalho enxuto e a área do jogo
