@@ -97,12 +97,12 @@ function PlayerStore({ player }: { player: Player }) {
   );
 }
 
-type AdminView = 'fila' | 'resolvidos' | 'itens';
+type AdminView = 'itens' | 'fila' | 'resolvidos';
 
-/** Gestão: fila de pedidos (na ordem em que chegaram), pedidos resolvidos e os itens do armazém. */
+/** Gestão: os itens do armazém (abre por eles), a fila de pedidos (na ordem em que chegaram) e os pedidos resolvidos. */
 function StoreAdmin() {
   const { state } = useGame();
-  const [view, setView] = useState<AdminView>('fila');
+  const [view, setView] = useState<AdminView>('itens');
   const queue = pendingOrders(state);
   const done = state.orders.filter((o) => o.status !== 'pendente');
 
@@ -112,14 +112,14 @@ function StoreAdmin() {
         Cada pedido vem do celular do jogador. Emita a nota de consumo e aprove: só então os dólares saem da carteira e o pedido vai para Resolvidos.
       </p>
       <div className="chips badge-views">
+        <button className={view === 'itens' ? 'chip selected' : 'chip'} onClick={() => setView('itens')}>
+          📦 Itens do armazém
+        </button>
         <button className={view === 'fila' ? 'chip selected' : 'chip'} onClick={() => setView('fila')}>
           📋 Fila de pedidos ({queue.length})
         </button>
         <button className={view === 'resolvidos' ? 'chip selected' : 'chip'} onClick={() => setView('resolvidos')}>
           ✅ Resolvidos ({done.length})
-        </button>
-        <button className={view === 'itens' ? 'chip selected' : 'chip'} onClick={() => setView('itens')}>
-          📦 Itens do armazém
         </button>
       </div>
       {view === 'fila' && <OrderQueue queue={queue} />}
