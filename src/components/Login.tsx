@@ -6,6 +6,41 @@ import InstallApp from "./InstallApp";
 type Mode = "login" | "matricula" | "senha" | "esqueci" | "gestao";
 
 const INK = "#2b1a0e";
+
+/** Campo de senha com um olho no cantinho para mostrar ou esconder o que foi digitado. */
+function PasswordInput(
+  props: Omit<React.InputHTMLAttributes<HTMLInputElement>, "type">,
+) {
+  const [show, setShow] = useState(false);
+  return (
+    <span className="password-field">
+      <input {...props} type={show ? "text" : "password"} />
+      <button
+        type="button"
+        className="password-eye"
+        onClick={() => setShow(!show)}
+        aria-label={show ? "Esconder senha" : "Mostrar senha"}
+        aria-pressed={show}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="22"
+          height="22"
+          aria-hidden="true"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="3" />
+          {show && <path d="M4 4l16 16" />}
+        </svg>
+      </button>
+    </span>
+  );
+}
 const line = { stroke: INK, strokeWidth: 2, strokeLinejoin: "round" as const };
 
 function Cactus({ x, s = 1 }: { x: number; s?: number }) {
@@ -398,8 +433,7 @@ export default function Login() {
           {mode !== "matricula" && (
             <label>
               {mode === "senha" || mode === "esqueci" ? "Senha nova" : "Senha"}
-              <input
-                type="password"
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={
@@ -412,8 +446,7 @@ export default function Login() {
           {(mode === "senha" || mode === "esqueci") && (
             <label>
               Repita a senha
-              <input
-                type="password"
+              <PasswordInput
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 autoComplete="new-password"

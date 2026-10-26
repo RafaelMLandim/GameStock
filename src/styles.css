@@ -3108,3 +3108,36 @@ button {
     height: 240px;
   }
 }
+
+/* Campo de senha com o olho no cantinho (mostrar/esconder) */
+.password-field {
+  position: relative;
+  display: flex;
+}
+
+.password-field input {
+  flex: 1;
+  padding-right: 44px;
+}
+
+.password-eye {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.password-eye:hover,
+.password-eye[aria-pressed='true'] {
+  color: var(--wood);
+}
