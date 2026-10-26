@@ -31,7 +31,7 @@ function audio(): AudioContext | null {
   if (!Ctor) return null;
   ctx = new Ctor();
   musicBus = ctx.createGain();
-  musicBus.gain.value = 0.08;
+  musicBus.gain.value = 0.04;
   musicBus.connect(ctx.destination);
   fxBus = ctx.createGain();
   fxBus.gain.value = 0.5;
@@ -393,7 +393,7 @@ void fetch(THEME_FILE, { method: 'HEAD' })
     if (url) {
       themeEl = new Audio(url);
       themeEl.loop = true;
-      themeEl.volume = 0.2;
+      themeEl.volume = 0.1;
       themeEl.preload = 'auto';
     }
     musicReady = true;
