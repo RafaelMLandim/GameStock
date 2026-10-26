@@ -5,3 +5,6 @@ data
 # senhas das contas de teste
 logins-de-teste.txt
 .vercel
+
+.vercel
+.env*

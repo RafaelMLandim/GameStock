@@ -3,3 +3,5 @@ dist
 data
 logins-de-teste.txt
 .git
+.env*
+.vercel
