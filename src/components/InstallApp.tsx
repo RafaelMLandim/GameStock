@@ -1,9 +1,11 @@
 import { useInstall } from '../install';
+import { useIsPhone } from './shared';
 
-/** Convite para pôr o jogo na tela inicial do celular, como um aplicativo. */
+/** Convite para pôr o jogo na tela inicial do celular, como um aplicativo (no computador não aparece). */
 export default function InstallApp() {
+  const phone = useIsPhone();
   const { mode, install } = useInstall();
-  if (mode === 'installed' || mode === 'none') return null;
+  if (!phone || mode === 'installed' || mode === 'none') return null;
   return (
     <div className="install-app">
       {mode === 'prompt' ? (

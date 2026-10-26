@@ -2789,25 +2789,33 @@ button {
   right: 0;
   bottom: 0;
   width: 100%;
-  height: 46vh;
-  min-height: 220px;
+  /* Em tela larga o desenho é ampliado pela largura e corta o céu: com pelo menos 26,5vw
+     de altura o pistoleiro (topo em y≈102 de 300) aparece inteiro, com o chapéu. */
+  height: var(--login-scene-h);
   pointer-events: none;
+  /* o céu do desenho se funde com o fundo da página, sem borda reta */
+  -webkit-mask-image: linear-gradient(transparent, #000 22%);
+  mask-image: linear-gradient(transparent, #000 22%);
 }
 
+.login-page {
+  --login-scene-h: max(46vh, 26.5vw, 220px);
+}
+
+/* O espaço embaixo do formulário tem a altura do deserto: o pistoleiro nunca fica atrás dele */
 .login-page .login-wrap {
   position: relative;
   z-index: 1;
-  padding-bottom: 40vh;
+  padding-bottom: calc(var(--login-scene-h) + 16px);
 }
 
 @media (max-width: 700px) {
-  .login-scene {
-    height: 34vh;
+  .login-page {
+    --login-scene-h: max(34vh, 220px);
   }
 
   .login-page .login-wrap {
     padding-top: 24px;
-    padding-bottom: 30vh;
   }
 }
 

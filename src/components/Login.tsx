@@ -143,8 +143,8 @@ function LoginScene() {
       preserveAspectRatio="xMidYMax slice"
       aria-hidden="true"
     >
-      <circle cx="560" cy="80" r="46" fill="#f6c34a" opacity="0.9" />
-      <circle cx="560" cy="80" r="64" fill="#f6c34a" opacity="0.18" />
+      <circle cx="560" cy="118" r="46" fill="#f6c34a" opacity="0.9" />
+      <circle cx="560" cy="118" r="64" fill="#f6c34a" opacity="0.18" />
       {/* mesas de pedra ao longe */}
       <path
         d="M0 200 L40 200 L60 150 L170 150 L190 200 L330 200 L345 172 L420 172 L440 200 L560 200 L585 130 L700 130 L725 200 L800 200 L800 260 L0 260 Z"
