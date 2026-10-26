@@ -81,10 +81,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
         })
         .catch(handleError);
     load();
-    const timer = setInterval(load, POLL_MS);
+    // Com o app em segundo plano não consulta (economiza bateria e o limite do servidor); ao voltar, atualiza na hora.
+    const timer = setInterval(() => document.visibilityState === 'visible' && load(), POLL_MS);
+    const onVisible = () => document.visibilityState === 'visible' && load();
+    document.addEventListener('visibilitychange', onVisible);
     return () => {
       alive = false;
       clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, [user, handleError]);
 
