@@ -12,7 +12,7 @@ function Statement({ text, seconds, onAnswer }: { text: string; seconds: number;
   };
   const { left } = useCountdown(seconds, !done, () => answer(null));
   return (
-    <div>
+    <div className="vf-round">
       <TimeBar left={left} total={seconds} />
       <h3 className="quiz-question">“{text}”</h3>
       <div className="vf-buttons">

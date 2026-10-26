@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAuth } from "../GameContext";
+import InstallApp from "./InstallApp";
 
 type Mode = "login" | "matricula" | "senha" | "esqueci" | "gestao";
 
@@ -458,6 +459,7 @@ export default function Login() {
             </button>
           )}
         </form>
+        <InstallApp />
       </div>
     </div>
   );

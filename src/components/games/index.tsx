@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { BADGE_POINTS, BADGE_WIN_BONUS, CATEGORY_LABELS, MAX_PENDING_BADGES, WIN_POINTS } from '../../data';
 import { badgeBonus, badgeTypesIn, pendingBadges, suggestedBadge, winPoints } from '../../game';
 import { useGame } from '../../GameContext';
+import { isInstalled } from '../../install';
 import { sfx } from '../../sound';
+import { useIsPhone } from '../shared';
 import type { GameKind, Mission, MissionGame } from '../../types';
 import { RequestBadge } from '../Badges';
 import CacaCacto from './CacaCacto';
@@ -292,6 +294,7 @@ function BadgeTip({ mission, practice }: { mission: Mission; practice?: boolean 
  */
 export function PlayMission({ mission, practice, onClose }: { mission: Mission; practice?: boolean; onClose: () => void }) {
   const { state, dispatch, myPlayer } = useGame();
+  const phone = useIsPhone();
   const [phase, setPhase] = useState<'intro' | 'play' | 'result'>('intro');
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{ won: boolean; detail?: string; points?: number }>({ won: false });
@@ -305,6 +308,22 @@ export function PlayMission({ mission, practice, onClose }: { mission: Mission; 
   const ended = useRef(false);
   const endTimer = useRef<number>();
   useEffect(() => () => window.clearTimeout(endTimer.current), []);
+
+  // Ao fechar a missão, sai da tela cheia que o "Começar" pediu.
+  useEffect(
+    () => () => {
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    },
+    [],
+  );
+
+  const start = () => {
+    // No celular pelo navegador, esconde a barra de endereço (no app instalado ela já não existe; iPhone não deixa).
+    if (phone && !isInstalled() && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.({ navigationUI: 'hide' }).catch(() => {});
+    }
+    setPhase('play');
+  };
 
   const finish = (won: boolean, detail?: string) => {
     // Alguns jogos ainda têm relógio correndo: só vale o primeiro fim.
@@ -335,7 +354,7 @@ export function PlayMission({ mission, practice, onClose }: { mission: Mission; 
 
   return (
     <div className="modal-backdrop game-backdrop">
-      <div className="modal game-modal" role="dialog" aria-label={mission.name}>
+      <div className={`modal game-modal${phase === 'play' ? ' playing' : ''}`} role="dialog" aria-label={mission.name}>
         <div className="modal-head">
           <span className="mission-icon">{mission.icon}</span>
           <div>
@@ -359,7 +378,7 @@ export function PlayMission({ mission, practice, onClose }: { mission: Mission; 
                 🎖️ +{bonus} ponto(s) extra(s) se vencer, pelo(s) seu(s) distintivo(s) {bonusBadges.map((t) => `${t.icon} ${t.name}`).join(' e ')}!
               </p>
             )}
-            <button className="btn primary big" onClick={() => setPhase('play')}>
+            <button className="btn primary big" onClick={start}>
               ▶️ Começar
             </button>
           </div>

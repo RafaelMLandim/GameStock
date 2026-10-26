@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Ícone do app: estrela de xerife sobre o pôr do sol do deserto (fundo cheio para servir de ícone "maskable") -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7d98b" />
+      <stop offset="0.62" stop-color="#e9a85a" />
+      <stop offset="0.62" stop-color="#c98a4a" />
+      <stop offset="1" stop-color="#8b5a2b" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#sky)" />
+  <circle cx="256" cy="318" r="120" fill="#f2c12e" opacity="0.45" />
+  <path d="M0 330 L70 290 L130 316 L210 262 L290 306 L360 270 L430 304 L512 280 L512 330 Z" fill="#b5603a" opacity="0.55" />
+  <g transform="translate(256 250)">
+    <circle r="150" fill="#6b3e1e" opacity="0.25" transform="translate(0 10)" />
+    <path
+      d="M0 -150 L36 -62 L130 -75 L72 0 L130 75 L36 62 L0 150 L-36 62 L-130 75 L-72 0 L-130 -75 L-36 -62 Z"
+      fill="#f2c12e"
+      stroke="#2b1a0e"
+      stroke-width="12"
+      stroke-linejoin="round"
+    />
+    <circle cx="0" cy="-150" r="16" fill="#f2c12e" stroke="#2b1a0e" stroke-width="10" />
+    <circle cx="130" cy="-75" r="16" fill="#f2c12e" stroke="#2b1a0e" stroke-width="10" />
+    <circle cx="130" cy="75" r="16" fill="#f2c12e" stroke="#2b1a0e" stroke-width="10" />
+    <circle cx="0" cy="150" r="16" fill="#f2c12e" stroke="#2b1a0e" stroke-width="10" />
+    <circle cx="-130" cy="75" r="16" fill="#f2c12e" stroke="#2b1a0e" stroke-width="10" />
+    <circle cx="-130" cy="-75" r="16" fill="#f2c12e" stroke="#2b1a0e" stroke-width="10" />
+    <circle r="58" fill="#fff3c4" stroke="#2b1a0e" stroke-width="10" />
+    <text y="22" font-family="Georgia, serif" font-size="68" font-weight="700" text-anchor="middle" fill="#6b3e1e">FE</text>
+  </g>
+</svg>
