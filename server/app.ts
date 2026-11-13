@@ -3,7 +3,8 @@ import { randomBytes, randomInt, scryptSync, timingSafeEqual } from 'node:crypto
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BADGE_TYPES, initialState } from '../src/data.js';
-import { normalizeState, reducer, uid, type Action } from '../src/game.js';
+import { normalizeState, noticeMissions, reducer, uid, type Action } from '../src/game.js';
+import webpush from 'web-push';
 import type { GameState, Role, User } from '../src/types';
 import { fileStore, postgresStore, type Snapshot } from './store.js';
 
@@ -33,8 +34,21 @@ interface Db {
   sessions: Record<string, string>;
   /** Fotos dos pedidos de distintivo: id -> dono e formato (o conteúdo fica no armazenamento). */
   photos: Record<string, { userId: string; ext: string }>;
+  /** Celulares inscritos para receber notificação push: userId -> inscrições. */
+  push: Record<string, PushSub[]>;
+  /** Chaves do push (VAPID), geradas na primeira vez se não vierem das variáveis de ambiente. */
+  vapid?: { publicKey: string; privateKey: string };
   game: GameState;
 }
+
+/** Inscrição de push de um celular (o navegador entrega o endereço e as chaves dele). */
+interface PushSub {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+  at: number;
+}
+
+const MAX_PUSH_PER_USER = 5;
 
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
 
@@ -44,6 +58,8 @@ function loadDb(raw: Partial<Db> | null): Db {
     roster: raw?.roster ?? {},
     sessions: raw?.sessions ?? {},
     photos: raw?.photos ?? {},
+    push: raw?.push ?? {},
+    vapid: raw?.vapid,
     game: raw ? normalizeState(raw.game ?? {}) : initialState(),
   };
 }
@@ -107,6 +123,8 @@ function authorize(db: Db, user: StoredUser, action: Action): Action | string {
       return own(action.id) ? action : 'Você só pode editar o seu personagem.';
     case 'USE_SHORTCUT':
       return own(action.playerId) ? action : 'Você só pode usar os seus atalhos.';
+    case 'SEE_NOTICES':
+      return own(action.playerId) ? action : 'Você só pode ler os seus avisos.';
     case 'WIN_MISSION':
     case 'LOSE_MISSION':
       return own(action.playerId) ? action : 'Você só pode jogar as suas missões.';
@@ -128,6 +146,8 @@ function authorize(db: Db, user: StoredUser, action: Action): Action | string {
 interface Reply {
   status?: number;
   body?: unknown;
+  /** Trabalho depois de gravar o banco (ex.: mandar as notificações push), antes de responder. */
+  after?: () => Promise<void>;
 }
 
 const fail = (status: number, error: string): Reply => ({ status, body: { error } });
@@ -152,7 +172,11 @@ const reading = (fn: Handler) => (req: Request, res: Response, next: NextFunctio
 const writing = (fn: Handler) => (req: Request, res: Response, next: NextFunction) =>
   store
     .write((s) => fn(s, req))
-    .then((reply) => send(res, reply))
+    .then(async (reply) => {
+      // Na Vercel o servidor pode congelar depois da resposta: o envio termina antes dela.
+      if (reply.after) await Promise.race([reply.after(), new Promise((r) => setTimeout(r, PUSH_TIMEOUT_MS))]).catch((err) => console.error(err));
+      send(res, reply);
+    })
     .catch(next);
 
 /** Exige login (e, com `admin`, que seja da gestão). */
@@ -436,12 +460,108 @@ app.post(
         console.error(err);
         return fail(400, 'Não foi possível aplicar a ação.');
       }
+      // Liberação que criou um aviso novo no sininho: também vai como push para os celulares.
+      const notice = next.notices[0];
+      const pushes = allowed.type === 'SET_RELEASED' && notice && notice !== s.data.game.notices[0] ? releasePushes(s, next, req) : undefined;
       if (next !== s.data.game) {
         s.data.game = next;
         s.version += 1;
         saveDb(s);
       }
-      return { body: { state: viewFor(s.data, user), version: s.version } };
+      return { body: { state: viewFor(s.data, user), version: s.version }, after: pushes };
+    }),
+  ),
+);
+
+// ---------- Notificações push ----------
+
+const PUSH_TIMEOUT_MS = 8000;
+
+/** Chaves do push: das variáveis de ambiente ou geradas uma vez e guardadas no banco. */
+function vapidKeys(s: Ctx): { publicKey: string; privateKey: string } {
+  const { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY } = process.env;
+  if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) return { publicKey: VAPID_PUBLIC_KEY, privateKey: VAPID_PRIVATE_KEY };
+  if (!s.data.vapid) {
+    s.data.vapid = webpush.generateVAPIDKeys();
+    saveDb(s);
+  }
+  return s.data.vapid;
+}
+
+/** Contato que vai junto no push (a Apple exige um https ou mailto de verdade). */
+function pushSubject(req: Request): string {
+  if (process.env.VAPID_SUBJECT) return process.env.VAPID_SUBJECT;
+  const host = req.headers['x-forwarded-host'] ?? req.headers.host;
+  const https = req.headers['x-forwarded-proto'] === 'https' || req.secure;
+  return https && host ? `https://${host}` : 'mailto:avisos@fronteira-do-estoque.app';
+}
+
+/** Monta o envio do aviso mais novo para quem ainda vai jogar alguma das missões liberadas. */
+function releasePushes(s: Ctx, game: GameState, req: Request): (() => Promise<void>) | undefined {
+  const notice = game.notices[0];
+  const targets = game.players
+    .filter((p) => p.userId && noticeMissions(game, p, notice).length > 0)
+    .flatMap((p) => s.data.push[p.userId!] ?? []);
+  if (!targets.length) return undefined;
+  const keys = vapidKeys(s);
+  const options = { vapidDetails: { subject: pushSubject(req), ...keys }, TTL: 24 * 60 * 60 };
+  const payload = JSON.stringify({ title: `${notice.icon} ${notice.title}`, body: notice.text, tag: notice.id, url: '/#mapa' });
+  return async () => {
+    const dead: string[] = [];
+    let sent = 0;
+    await Promise.all(
+      targets.map((sub) =>
+        webpush.sendNotification(sub, payload, options).then(() => void sent++, (err: { statusCode?: number }) => {
+          // 404/410: o celular cancelou a inscrição (desinstalou, limpou dados...).
+          if (err.statusCode === 404 || err.statusCode === 410) dead.push(sub.endpoint);
+          else console.error('Push falhou:', err.statusCode ?? err);
+        }),
+      ),
+    );
+    console.log(`Push "${notice.title}": ${sent} enviado(s), ${dead.length} inscrição(ões) vencida(s) removida(s).`);
+    if (dead.length)
+      await store.write((s2) => {
+        for (const id of Object.keys(s2.data.push)) s2.data.push[id] = s2.data.push[id].filter((x) => !dead.includes(x.endpoint));
+        saveDb(s2);
+      });
+  };
+}
+
+// Chave pública para o celular se inscrever (gerada na primeira vez).
+app.get(
+  '/api/push/key',
+  writing(signedIn((s) => ({ body: { publicKey: vapidKeys(s).publicKey } }))),
+);
+
+// O celular aceitou receber notificações: guarda a inscrição na conta de quem está logado.
+app.post(
+  '/api/push/subscribe',
+  writing(
+    signedIn((s, req, user) => {
+      const sub = req.body?.subscription;
+      const endpoint = String(sub?.endpoint ?? '');
+      const p256dh = String(sub?.keys?.p256dh ?? '');
+      const auth = String(sub?.keys?.auth ?? '');
+      if (!/^https:\/\//.test(endpoint) || !p256dh || !auth || endpoint.length > 1000) return fail(400, 'Inscrição inválida.');
+      // Um celular recebe os avisos de uma conta só: a última que entrou nele.
+      for (const id of Object.keys(s.data.push)) s.data.push[id] = s.data.push[id].filter((x) => x.endpoint !== endpoint);
+      const mine = s.data.push[user.id] ?? [];
+      s.data.push[user.id] = [...mine, { endpoint, keys: { p256dh, auth }, at: Date.now() }].slice(-MAX_PUSH_PER_USER);
+      saveDb(s);
+      return { body: { ok: true } };
+    }),
+  ),
+);
+
+// Desligou as notificações neste celular.
+app.post(
+  '/api/push/unsubscribe',
+  writing(
+    signedIn((s, req, user) => {
+      const endpoint = String(req.body?.endpoint ?? '');
+      s.data.push[user.id] = (s.data.push[user.id] ?? []).filter((x) => x.endpoint !== endpoint);
+      saveDb(s);
+      return { body: { ok: true } };
     }),
   ),
 );

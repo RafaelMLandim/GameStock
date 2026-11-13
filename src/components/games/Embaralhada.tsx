@@ -82,7 +82,9 @@ export default function Embaralhada({ game, onFinish }: GameProps<'embaralhada'>
           Pular
         </button>
       </form>
-      {wrong && <p className="game-bad">Não é essa, forasteiro. Tente de novo!</p>}
+      <p className="game-bad" style={{ visibility: wrong ? 'visible' : 'hidden' }} aria-hidden={!wrong}>
+        Não é essa, forasteiro. Tente de novo!
+      </p>
     </div>
   );
 }

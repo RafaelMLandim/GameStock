@@ -17,6 +17,7 @@ import Ordem from './Ordem';
 import Quiz from './Quiz';
 import TiroAlvo from './TiroAlvo';
 import VerdadeiroFalso from './VerdadeiroFalso';
+import GameIcon from '../GameIcon';
 
 /** Pausa entre o fim do jogo e a tela de resultado, para ver a última jogada (tiro, garrafa, carta...). */
 const END_PAUSE_MS = 1800;
@@ -356,11 +357,11 @@ export function PlayMission({ mission, practice, onClose }: { mission: Mission; 
     <div className="modal-backdrop game-backdrop">
       <div className={`modal game-modal${phase === 'play' ? ' playing' : ''}`} role="dialog" aria-label={mission.name}>
         <div className="modal-head">
-          <span className="mission-icon">{mission.icon}</span>
+          <span className="mission-icon"><GameIcon icon={mission.icon} /></span>
           <div>
             <h2>{mission.name}</h2>
             <p className="muted">
-              {info.icon} {info.label}
+              <GameIcon icon={info.icon} /> {info.label}
               {practice ? ' · modo treino (não vale recompensa)' : ` · recompensa $${mission.reward}`}
             </p>
           </div>

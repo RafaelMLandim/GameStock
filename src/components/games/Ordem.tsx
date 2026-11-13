@@ -55,7 +55,7 @@ export default function Ordem({ game, onFinish }: GameProps<'ordem'>) {
         ))}
       </ol>
       <div className="game-feedback">
-        {checked && <span>{right} de {items.length} no lugar certo (verde).</span>}
+        <span>{checked ? `${right} de ${items.length} no lugar certo (verde).` : ' '}</span>
         <button className="btn primary" onClick={check}>
           🔍 Conferir
         </button>

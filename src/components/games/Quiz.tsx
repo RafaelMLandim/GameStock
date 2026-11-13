@@ -49,14 +49,13 @@ export default function Quiz({ game, onFinish }: GameProps<'quiz'>) {
           </button>
         ))}
       </div>
-      {picked !== null && (
-        <div className="game-feedback">
-          <span>{q.options[picked].correct ? '✅ Na mosca, parceiro!' : '❌ Errou o tiro.'}</span>
-          <button className="btn primary" onClick={next}>
-            {last ? 'Ver resultado' : 'Próxima ➜'}
-          </button>
-        </div>
-      )}
+      {/* o espaço do aviso fica sempre reservado, então as respostas não pulam ao responder */}
+      <div className={`game-feedback${picked === null ? ' reserved' : ''}`} aria-hidden={picked === null}>
+        <span>{picked === null ? ' ' : q.options[picked].correct ? '✅ Na mosca, parceiro!' : '❌ Errou o tiro.'}</span>
+        <button className="btn primary" onClick={next} disabled={picked === null} tabIndex={picked === null ? -1 : undefined}>
+          {last ? 'Ver resultado' : 'Próxima ➜'}
+        </button>
+      </div>
     </div>
   );
 }

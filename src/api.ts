@@ -82,6 +82,9 @@ export const api = {
   state: (version?: number) => request<Partial<Synced>>('GET', version === undefined ? '/api/state' : `/api/state?v=${version}`),
   action: (action: Action) => request<Synced>('POST', '/api/action', { action }),
   uploadPhoto: (data: string) => request<{ id: string }>('POST', '/api/photos', { data }),
+  pushKey: () => request<{ publicKey: string }>('GET', '/api/push/key'),
+  pushSubscribe: (subscription: PushSubscriptionJSON) => request<{ ok: boolean }>('POST', '/api/push/subscribe', { subscription }),
+  pushUnsubscribe: (endpoint: string) => request<{ ok: boolean }>('POST', '/api/push/unsubscribe', { endpoint }),
   /** A foto exige login, então vem por fetch (com o token) e vira um endereço local. */
   photoUrl: async (id: string): Promise<string> => {
     const token = getToken();

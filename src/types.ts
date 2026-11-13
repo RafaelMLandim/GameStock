@@ -170,6 +170,19 @@ export interface Player {
   purchases: Record<string, number>;
   /** Pontos para a premiação: vitórias nos minijogos + distintivos da gestão. */
   categoryPoints: Record<MissionCategory, number>;
+  /** Quando a pessoa abriu o sininho pela última vez (avisos depois disso contam como novos). */
+  noticesSeenAt?: number;
+}
+
+/** Aviso do sininho: criado quando a gestão libera missões (um aviso por liberação). */
+export interface Notice {
+  id: string;
+  at: number;
+  icon: string;
+  title: string;
+  text: string;
+  /** Missões liberadas: o aviso só aparece para quem ainda vai jogar alguma delas. */
+  missionIds: string[];
 }
 
 /** Tipo de distintivo: uma atitude real no estoque que a gestão reconhece. */
@@ -255,11 +268,15 @@ export interface StoreOrder {
 export interface GameState {
   /** Versão da economia (valores em dólares); saves antigos são convertidos uma vez. */
   economy?: number;
+  /** Versão do conteúdo dos jogos padrão; saves antigos recebem as perguntas novas uma vez. */
+  content?: number;
   players: Player[];
   missions: Mission[];
   storeItems: StoreItem[];
   badges: Badge[];
   /** Pedidos de troca no Armazém, do mais antigo para o mais novo. */
   orders: StoreOrder[];
+  /** Avisos do sininho, do mais novo para o mais antigo. */
+  notices: Notice[];
   log: LogEntry[];
 }

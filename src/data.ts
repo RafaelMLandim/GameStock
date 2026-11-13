@@ -71,6 +71,14 @@ export const DEFAULT_MISSIONS: Mission[] = [
       ['PALETE', 'Base de madeira para empilhar a carga'],
       ['FEFO', 'Primeiro que vence, primeiro que sai'],
       ['ETIQUETA', 'Identifica o produto na prateleira'],
+      ['CAIXA', 'Embalagem de papelão que protege o produto'],
+      ['CARGA', 'O que o caminhão traz ou leva'],
+      ['LOTE', 'Produtos fabricados juntos, com o mesmo número'],
+      ['VALIDADE', 'Data até quando o produto pode ser vendido'],
+      ['EPI', 'Equipamento de Proteção Individual (Regra de Ouro 1)'],
+      ['LUVA', 'Protege as mãos no manuseio da carga'],
+      ['CLIENTE', 'Para quem a gente trabalha todo dia'],
+      ['LIMPEZA', 'Seisou: o 3º senso do 5S'],
     ),
   }),
   mission(0, 'acamp-memoria', '🃏', 'Memória do Pioneiro', 'Encontre os pares de figuras do Velho Oeste.', MISSION_REWARD, 'espirito', {
@@ -84,16 +92,40 @@ export const DEFAULT_MISSIONS: Mission[] = [
       ['🔥', '🔥'],
     ],
   }),
-  mission(0, 'acamp-quiz', '⭐', 'O Código do Oeste', 'Responda às perguntas básicas do nosso estoque. Acerte 3 de 4.', MISSION_REWARD, 'qualidade', {
-    kind: 'quiz',
-    minCorrect: 3,
-    questions: [
-      q('O que significa FEFO?', 'Primeiro que vence, primeiro que sai', 'Primeiro que entra, primeiro que sai', 'Último que chega, primeiro que sai'),
-      q('O que é EPI?', 'Equipamento de Proteção Individual', 'Estoque de Peças Importadas', 'Etiqueta de Produto Identificado'),
-      q('Encontrou um produto avariado. O que fazer?', 'Separar e avisar o responsável', 'Guardar no meio dos outros', 'Jogar fora sem avisar'),
-      q('Para que serve o endereçamento no estoque?', 'Saber exatamente onde cada produto está', 'Enfeitar as prateleiras', 'Contar quantas pessoas trabalham no setor'),
-    ],
-  }),
+  mission(
+    0,
+    'acamp-quiz',
+    '⭐',
+    'O Código do Oeste',
+    'O código da nossa companhia: os Direcionadores Estratégicos da Brasal. Acerte 3 de 4.',
+    MISSION_REWARD,
+    'qualidade',
+    {
+      kind: 'quiz',
+      minCorrect: 3,
+      questions: [
+        q(
+          'Qual direcionador fala em garantir a saúde financeira e o futuro da empresa, gerando valor?',
+          'Perenidade',
+          'Mercado e Clientes',
+          'Processo e Tecnologia',
+        ),
+        q(
+          'O que a Brasal busca no direcionador Mercado e Clientes?',
+          'Ser líder de mercado, fortalecendo refrigerantes e criando novas categorias',
+          'Vender para um cliente só',
+          'Diminuir a quantidade de produtos',
+        ),
+        q(
+          'Qual direcionador é a base da casa: valorizar pessoas num ambiente seguro, saudável e feliz?',
+          'Gente, Gestão e Cultura',
+          'Perenidade',
+          'Mercado e Clientes',
+        ),
+        q('Que cultura sustenta todos os Direcionadores Estratégicos?', 'Cultura de Realização Brasal', 'Cultura do improviso', 'Cultura do cada um por si'),
+      ],
+    },
+  ),
   mission(0, 'acamp-duelo', '🔫', 'Duelo ao Meio-Dia', 'Espere o sino e saque mais rápido que o bandido. Vença 2 de 3.', MISSION_REWARD, 'espirito', {
     kind: 'duelo',
     rounds: 3,
@@ -111,16 +143,16 @@ export const DEFAULT_MISSIONS: Mission[] = [
     target: 12,
     seconds: 30,
   }),
-  mission(1, 'vila-vf', '⚖️', 'Verdade ou Mentira, Forasteiro?', 'Responda V ou F antes do relógio acabar. Acerte 4 de 5.', MISSION_REWARD, 'seguranca', {
+  mission(1, 'vila-vf', '⚖️', 'Verdade ou Mentira, Forasteiro?', 'As Regras de Ouro: responda V ou F antes do relógio acabar. Acerte 4 de 5.', MISSION_REWARD, 'seguranca', {
     kind: 'vf',
     seconds: 8,
     minCorrect: 4,
     statements: [
-      vf(true, 'Corredores devem ficar livres de caixas e obstáculos.'),
-      vf(false, 'Pode passar por baixo de uma carga suspensa se for rápido.'),
-      vf(true, 'O produto com validade mais próxima deve sair primeiro.'),
-      vf(false, 'Usar EPI é opcional quando o serviço é rápido.'),
-      vf(true, 'Pisos molhados devem ser sinalizados.'),
+      vf(true, 'Os EPIs devem ser usados e mantidos em condições adequadas de uso.'),
+      vf(false, 'Lavar as mãos só é necessário na hora do almoço.'),
+      vf(true, 'Só se trabalha com permissão de trabalho válida, liberada e bem entendida.'),
+      vf(false, 'Exame médico ocupacional vencido não tem problema.'),
+      vf(true, 'Viu vazamento ou desperdício de água ou energia? Avise a Gestão Ambiental.'),
     ],
   }),
   mission(1, 'vila-memoria', '🧩', 'Pares da Segurança', 'Ligue cada EPI à parte do corpo que ele protege.', MISSION_REWARD, 'seguranca', {
@@ -151,6 +183,15 @@ export const DEFAULT_MISSIONS: Mission[] = [
       ['EMPILHADEIRA', 'Máquina que levanta paletes'],
       ['DOCA', 'Onde o caminhão encosta para carregar'],
       ['PEDIDO', 'O que o cliente quer receber'],
+      ['EXPEDIÇÃO', 'Setor que despacha os pedidos'],
+      ['RECEBIMENTO', 'Onde a mercadoria é conferida assim que chega'],
+      ['CONFERÊNCIA', 'Checar se o produto e a quantidade estão certos'],
+      ['ENDEREÇO', 'Posição exata de cada produto no armazém'],
+      ['AVARIA', 'Produto danificado no transporte ou no manuseio'],
+      ['SEPARAÇÃO', 'Juntar os itens de cada pedido'],
+      ['NOTA FISCAL', 'Documento que acompanha a mercadoria'],
+      ['ROMANEIO', 'Lista da carga de cada caminhão'],
+      ['ORDENAÇÃO', 'Seiton: um lugar para cada coisa'],
     ),
   }),
   mission(2, 'estacao-quiz', '🎫', 'Quiz do Bilheteiro', 'Perguntas sobre separação e expedição. Acerte 3 de 4.', MISSION_REWARD, 'qualidade', {
@@ -170,21 +211,25 @@ export const DEFAULT_MISSIONS: Mission[] = [
     count: 5,
     seconds: 40,
   }),
-  mission(3, 'mina-memoria', '💰', 'Memória do Garimpeiro', 'Ligue cada termo do estoque ao seu significado.', MISSION_REWARD, 'qualidade', {
+  mission(3, 'mina-memoria', '💰', 'Memória do Garimpeiro', 'Ligue cada senso do 5S ao seu nome em japonês.', MISSION_REWARD, 'qualidade', {
     kind: 'memoria',
     pairs: [
-      ['FEFO', 'Vence primeiro, sai primeiro'],
-      ['FIFO', 'Entra primeiro, sai primeiro'],
-      ['Inventário', 'Contagem do estoque'],
-      ['Picking', 'Separação de pedidos'],
-      ['Avaria', 'Produto danificado'],
-      ['Endereço', 'Local do produto no estoque'],
+      ['Seiri', 'Senso de Utilização'],
+      ['Seiton', 'Senso de Ordenação'],
+      ['Seisou', 'Senso de Limpeza'],
+      ['Seiketsu', 'Senso de Saúde'],
+      ['Shitsuke', 'Senso de Autodisciplina'],
+      ['5S', 'Cuidar da base da qualidade'],
     ],
   }),
-  mission(3, 'mina-embaralhada', '⛏️', 'Pepitas Embaralhadas', 'Desembaralhe as palavras antes que o lampião apague.', MISSION_REWARD, 'seguranca', {
+  mission(3, 'mina-embaralhada', '⛏️', 'Pepitas Embaralhadas', 'Palavras das Regras de Ouro: desembaralhe antes que o lampião apague.', MISSION_REWARD, 'seguranca', {
     kind: 'embaralhada',
     seconds: 90,
-    words: words(['SEGURANÇA', 'Vem sempre em primeiro lugar'], ['LOTE', 'Grupo de produtos fabricados juntos'], ['AVARIA', 'Produto danificado']),
+    words: words(
+      ['PERMISSÃO', 'Só trabalhe com ela válida e liberada (Regra 3)'],
+      ['HIGIENE', 'Uniforme limpo e mãos lavadas (Regra 5)'],
+      ['DESCARTE', 'Faça corretamente, principalmente dos perigosos (Regra 8)'],
+    ),
   }),
   mission(3, 'mina-vf', '🥇', 'Ouro ou Pedra?', 'Verdadeiro (ouro) ou falso (pedra)? Acerte 4 de 5.', MISSION_REWARD, 'seguranca', {
     kind: 'vf',
@@ -207,7 +252,7 @@ export const DEFAULT_MISSIONS: Mission[] = [
   }),
   mission(4, 'desf-ordem', '🧹', 'A Trilha do 5S', 'Coloque os 5 sensos na ordem certa.', MISSION_REWARD, 'qualidade', {
     kind: 'ordem',
-    steps: ['Seleção (Seiri)', 'Ordenação (Seiton)', 'Limpeza (Seiso)', 'Padronização (Seiketsu)', 'Disciplina (Shitsuke)'],
+    steps: ['Seiri: senso de Utilização', 'Seiton: senso de Ordenação', 'Seisou: senso de Limpeza', 'Seiketsu: senso de Saúde', 'Shitsuke: senso de Autodisciplina'],
   }),
   mission(4, 'desf-quiz', '🦅', 'Quiz do Desfiladeiro', 'Perguntas sobre empilhadeira e riscos. Acerte 3 de 4.', MISSION_REWARD, 'seguranca', {
     kind: 'quiz',
@@ -226,13 +271,21 @@ export const DEFAULT_MISSIONS: Mission[] = [
   }),
 
   // 6. Forte da Companhia
-  mission(5, 'forte-forca', '💀', 'Forca do Forte', 'Palavras da segurança do forte.', MISSION_REWARD, 'seguranca', {
+  mission(5, 'forte-forca', '💀', 'Forca do Forte', 'Palavras da segurança do forte e das Regras de Ouro.', MISSION_REWARD, 'seguranca', {
     kind: 'forca',
     words: words(
       ['EXTINTOR', 'Combate o princípio de incêndio'],
       ['SINALIZAÇÃO', 'Placas e faixas que orientam'],
       ['ROTA DE FUGA', 'Caminho para sair numa emergência'],
-      ['CONE', 'Usado para isolar uma área'],
+      ['KIT AMBIENTAL', 'Use imediatamente em derramamento ou vazamento (Regra de Ouro 7)'],
+      ['BLOQUEIO', 'Antes de intervir, faça nas fontes de energia (Regra de Ouro 10)'],
+      ['PERMISSÃO', 'Só trabalhe com ela válida e liberada (Regra de Ouro 3)'],
+      ['EXAMES MÉDICOS', 'Mantenha em dia, nos prazos certos (Regra de Ouro 2)'],
+      ['HIGIENE', 'Uniforme limpo e mãos lavadas (Regra de Ouro 5)'],
+      ['REFEITÓRIO', 'Um dos lugares autorizados para comer (Regra de Ouro 4)'],
+      ['DESCARTE', 'Faça certo com todos os resíduos (Regra de Ouro 8)'],
+      ['VAZAMENTO', 'Notou um? Avise a Gestão Ambiental (Regra de Ouro 9)'],
+      ['ÁREA RESTRITA', 'Proibido entrar sem autorização (Regra de Ouro 6)'],
     ),
   }),
   mission(5, 'forte-vf', '🛡️', 'Sentinela do Forte', 'V ou F, mais rápido agora. Acerte 4 de 5.', MISSION_REWARD, 'seguranca', {
@@ -244,7 +297,7 @@ export const DEFAULT_MISSIONS: Mission[] = [
       vf(false, 'Pode usar o celular enquanto dirige a empilhadeira.'),
       vf(true, 'Todo acidente ou quase acidente deve ser comunicado.'),
       vf(true, 'Ferramentas devem voltar ao lugar depois do uso.'),
-      vf(false, 'Produtos químicos podem ficar junto com alimentos.'),
+      vf(false, 'Pode entrar em área restrita sem autorização se for só um minuto.'),
     ],
   }),
   mission(5, 'forte-corrida', '🐎', 'Cavalaria do Forte', 'Os cavalos da cavalaria são mais rápidos. Vença a corrida!', MISSION_REWARD, 'espirito', {
@@ -270,8 +323,8 @@ export const DEFAULT_MISSIONS: Mission[] = [
     seconds: 80,
     words: words(
       ['CLIENTE', 'Para quem fazemos tudo isso'],
-      ['EXPEDIÇÃO', 'Setor que envia os pedidos'],
-      ['QUALIDADE', 'Fazer certo da primeira vez'],
+      ['PERENIDADE', 'Direcionador: saúde financeira e futuro da empresa'],
+      ['EFICIÊNCIA', 'Direcionador: inovar com um trabalho mais ágil e digital'],
       ['EQUIPE', 'Ninguém vence sozinho'],
     ),
   }),
@@ -284,7 +337,12 @@ export const DEFAULT_MISSIONS: Mission[] = [
     kind: 'quiz',
     minCorrect: 3,
     questions: [
-      q('O que é a curva ABC no estoque?', 'Classificar os itens pela importância e giro', 'Um tipo de corredor curvo', 'O alfabeto da etiqueta'),
+      q(
+        'No direcionador Processo e Tecnologia, o que é Relacionamento?',
+        'Fortalecer os laços com clientes, parceiros e fornecedores',
+        'Conversar só com a própria equipe',
+        'Trocar de fornecedor todo mês',
+      ),
       q('Por que manter o estoque organizado?', 'Achar rápido e evitar erros e perdas', 'Só para ficar bonito', 'Não faz diferença'),
       q('O que é um quase acidente?', 'Situação que poderia ter causado um acidente', 'Um acidente sem importância', 'Um acidente fora do trabalho'),
       q('Qual atitude é de um bom companheiro de trabalho?', 'Ajudar o colega e compartilhar o que sabe', 'Esconder informação', 'Deixar o problema para o próximo turno'),
@@ -309,10 +367,17 @@ export const DEFAULT_MISSIONS: Mission[] = [
   mission(7, 'saloon-forca', '💀', 'A Forca da Lenda', 'As palavras mais difíceis do Oeste.', MISSION_REWARD, 'companheirismo', {
     kind: 'forca',
     words: words(
-      ['LENDA', 'Quem chega ao Saloon dos Campeões'],
       ['XERIFE', 'Guardião da lei na cidade'],
-      ['COMPANHEIRISMO', 'Espírito de quem ajuda os colegas'],
       ['DILIGÊNCIA', 'Carruagem do Velho Oeste'],
+      ['COMPANHEIRISMO', 'Espírito de quem ajuda os colegas'],
+      ['REALIZAÇÃO', 'A cultura da Brasal: Cultura de ...'],
+      ['PERENIDADE', 'O 1º Direcionador Estratégico'],
+      ['SEIRI', 'O senso de Utilização, em japonês'],
+      ['SEIKETSU', 'O senso de Saúde, em japonês'],
+      ['SHITSUKE', 'O senso de Autodisciplina, em japonês'],
+      ['AUTODISCIPLINA', 'O 5º senso: fazer o certo sem ninguém mandar'],
+      ['EFICIÊNCIA', 'Faz parte de Processo e Tecnologia: fazer mais com menos'],
+      ['RELACIONAMENTO', 'Faz parte de Processo e Tecnologia: o laço com os clientes'],
     ),
   }),
   mission(7, 'saloon-vf', '🍻', 'Rodada no Saloon', 'Seis afirmações, 6 segundos cada. Acerte 5.', MISSION_REWARD, 'seguranca', {
@@ -322,10 +387,10 @@ export const DEFAULT_MISSIONS: Mission[] = [
     statements: [
       vf(true, 'FEFO prioriza a data de validade.'),
       vf(false, 'O extintor pode ficar atrás dos paletes.'),
-      vf(true, 'O 5S começa pela Seleção (Seiri).'),
-      vf(false, 'Inventário só precisa ser feito quando sobra tempo.'),
+      vf(true, 'O 5S começa pelo senso de Utilização (Seiri).'),
+      vf(false, 'Resíduo perigoso pode ir no lixo comum.'),
       vf(true, 'A carga na empilhadeira deve ir com os garfos baixos.'),
-      vf(true, 'Comunicar um quase acidente ajuda a evitar acidentes.'),
+      vf(true, 'Antes de qualquer intervenção, as fontes de energia devem ser bloqueadas.'),
     ],
   }),
 
@@ -342,7 +407,7 @@ export const DEFAULT_MISSIONS: Mission[] = [
       kind: 'quiz',
       minCorrect: 3,
       questions: [
-        q('Qual é a primeira etapa do 5S?', 'Seleção (Seiri)', 'Limpeza (Seiso)', 'Disciplina (Shitsuke)'),
+        q('Qual é o 1º S do 5S?', 'Senso de Utilização (Seiri)', 'Senso de Limpeza (Seisou)', 'Senso de Autodisciplina (Shitsuke)'),
         q('O que FIFO significa?', 'Primeiro que entra, primeiro que sai', 'Primeiro que vence, primeiro que sai', 'Fila de itens fora de ordem'),
         q('Onde o extintor deve ficar?', 'Sinalizado e desobstruído', 'Escondido atrás das caixas', 'Trancado no escritório'),
       ],
@@ -525,14 +590,40 @@ export const MISSION_BADGE_HINTS: Record<string, string> = {
 /** Sobe quando os valores da economia mudam de escala (ver normalizeState). */
 export const ECONOMY_VERSION = 4;
 
+/**
+ * Versão do conteúdo dos jogos padrão. Versão 1: Regras de Ouro, 5S da Brasal e Direcionadores
+ * Estratégicos. Versão 2: mais palavras em cada forca, ficando mais difíceis a cada território. Versão 3: no V ou F da Vila, a afirmação do lanche deu lugar à da higiene das mãos.
+ * Cada missão listada guarda as impressões digitais dos conteúdos padrão anteriores: só é trocada
+ * se ainda estiver igual a um deles (o que a gestão editou fica como está).
+ */
+export const CONTENT_VERSION = 3;
+export const OLD_CONTENT_FINGERPRINTS: Record<string, string[]> = {
+  'acamp-quiz': ['i53dr3'],
+  'vila-vf': ['5kqmqp', '1deadb1'],
+  'mina-memoria': ['9l24n6'],
+  'mina-embaralhada': ['t39bs2'],
+  'desf-ordem': ['1u0xdvv'],
+  'forte-forca': ['18ubc8i', '2i396q'],
+  'forte-vf': ['16qp5ed'],
+  'cidade-embaralhada': ['z4d4hc'],
+  'cidade-quiz': ['1s4n196'],
+  'saloon-forca': ['ccdqoi', '12c8xz0'],
+  'saloon-vf': ['1w4zphn'],
+  procurado: ['9ortng'],
+  'acamp-forca': ['1g3iyts'],
+  'estacao-forca': ['d4ckzx'],
+};
+
 export function initialState(): GameState {
   return {
     economy: ECONOMY_VERSION,
+    content: CONTENT_VERSION,
     players: [],
     missions: DEFAULT_MISSIONS,
     storeItems: DEFAULT_STORE,
     badges: [],
     orders: [],
+    notices: [],
     log: [],
   };
 }

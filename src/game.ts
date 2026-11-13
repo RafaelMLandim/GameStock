@@ -7,8 +7,10 @@ import {
   DEFAULT_MISSIONS,
   DEFAULT_STORE,
   RETIRED_STORE,
+  CONTENT_VERSION,
   ECONOMY_VERSION,
   LAST_TERRITORY,
+  OLD_CONTENT_FINGERPRINTS,
   MAX_BADGE_WIN_BONUS,
   MAX_PENDING_BADGES,
   MISSION_BADGE_HINTS,
@@ -18,7 +20,7 @@ import {
   WIN_POINTS,
   initialState,
 } from './data.js';
-import type { Badge, BadgeType, CardId, GameState, LogEntry, Mission, MissionCategory, Player, StoreItem, StoreOrder } from './types';
+import type { Badge, BadgeType, CardId, GameState, LogEntry, Mission, MissionCategory, Notice, Player, StoreItem, StoreOrder } from './types';
 
 export type PlayerProfile = Pick<Player, 'realName' | 'codename' | 'avatar' | 'look' | 'color' | 'backdrop'>;
 
@@ -92,16 +94,52 @@ function brasalStore(state: GameState): GameState {
   return { ...state, economy: ECONOMY_VERSION, storeItems: [...added, ...kept] };
 }
 
+/** JSON com as chaves em ordem: o Postgres (jsonb) reordena as chaves ao gravar. */
+function canonical(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(canonical).join(',')}]`;
+  if (v && typeof v === 'object') {
+    const o = v as Record<string, unknown>;
+    return `{${Object.keys(o)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${canonical(o[k])}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(v);
+}
+
+export function contentFingerprint(game: unknown): string {
+  const s = canonical(game);
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+
+/** Leva as perguntas novas (Regras de Ouro, 5S, Direcionadores) às missões padrão que a gestão não editou. */
+function updateDefaultContent(state: GameState): GameState {
+  return {
+    ...state,
+    content: CONTENT_VERSION,
+    missions: state.missions.map((m) => {
+      const old = OLD_CONTENT_FINGERPRINTS[m.id];
+      const fresh = DEFAULT_MISSIONS.find((d) => d.id === m.id);
+      if (!old || !fresh || !m.game || !old.includes(contentFingerprint(m.game))) return m;
+      return { ...m, name: fresh.name, description: fresh.description, game: fresh.game };
+    }),
+  };
+}
+
 export function normalizeState(raw: Partial<GameState>): GameState {
   const loaded = { ...initialState(), ...raw };
   const converted = (raw.economy ?? 0) < 1 && raw.players ? convertOldEconomy(loaded) : loaded;
-  const base = (converted.economy ?? 0) < ECONOMY_VERSION && raw.players ? brasalStore(converted) : converted;
+  const stored = (converted.economy ?? 0) < ECONOMY_VERSION && raw.players ? brasalStore(converted) : converted;
+  const base = (raw.content ?? 0) < CONTENT_VERSION && raw.missions ? updateDefaultContent(stored) : stored;
   // Missões antigas (atividades sem minijogo) dão lugar às missões-minijogo padrão.
   const missions = base.missions.filter((m) => m.game).map(fixOldIcon);
   return {
     ...base,
     missions: missions.length ? missions : DEFAULT_MISSIONS,
     orders: base.orders ?? [],
+    notices: base.notices ?? [],
     storeItems: base.storeItems.map((i) => (i.cost === undefined ? { ...i, cost: DEFAULT_STORE.find((d) => d.id === i.id)?.cost } : i)),
     players: base.players.map((p) => ({
       ...p,
@@ -120,6 +158,7 @@ export type Action =
   | { type: 'UPDATE_PLAYER'; id: string; changes: Partial<PlayerProfile> }
   | { type: 'REMOVE_PLAYER'; id: string }
   | { type: 'SET_RELEASED'; missionIds: string[]; released: boolean }
+  | { type: 'SEE_NOTICES'; playerId: string }
   | { type: 'WIN_MISSION'; playerId: string; missionId: string }
   | { type: 'LOSE_MISSION'; playerId: string; missionId: string }
   | { type: 'REQUEST_BADGE'; badge: Pick<Badge, 'id' | 'playerId' | 'typeId' | 'reason' | 'photoId'> }
@@ -254,6 +293,45 @@ export function newPlayer(data: PlayerProfile, userId?: string): Player {
   };
 }
 
+/** Quantos avisos o sininho guarda (os mais antigos saem). */
+const MAX_NOTICES = 30;
+
+function placeOf(m: Mission): string {
+  return m.territory == null ? 'qualquer lugar do mapa' : TERRITORIES[m.territory].name;
+}
+
+/** Aviso de missões liberadas, com o lugar onde estão. */
+function releaseNotice(missions: Mission[]): Notice {
+  const base = { id: uid(), at: Date.now(), icon: '📯', missionIds: missions.map((m) => m.id) };
+  if (missions.length === 1) {
+    const m = missions[0];
+    return { ...base, title: 'Nova missão liberada!', text: `"${m.name}" já pode ser jogada em ${placeOf(m)}.` };
+  }
+  const places = [...new Set(missions.map(placeOf))];
+  const where = places.length === 1 ? ` em ${places[0]}` : '';
+  return {
+    ...base,
+    title: `${missions.length} novas missões liberadas!`,
+    text: `Já podem ser jogadas${where}: ${missions.map((m) => m.name).join(', ')}.`,
+  };
+}
+
+/** Missões do aviso que a pessoa ainda vai jogar (liberadas, não concluídas, aqui ou mais à frente). */
+export function noticeMissions(state: GameState, p: Player, n: Notice): Mission[] {
+  return state.missions.filter(
+    (m) => n.missionIds.includes(m.id) && m.released && !p.cleared.includes(m.id) && (m.territory == null || m.territory >= p.territory),
+  );
+}
+
+/** Avisos do sininho que valem para a pessoa (os de missões que ela já fez ou já passou somem). */
+export function noticesFor(state: GameState, p: Player): Notice[] {
+  return (state.notices ?? []).filter((n) => noticeMissions(state, p, n).length > 0);
+}
+
+export function unreadNotices(state: GameState, p: Player): Notice[] {
+  return noticesFor(state, p).filter((n) => n.at > (p.noticesSeenAt ?? 0));
+}
+
 function entry(icon: string, text: string): LogEntry {
   return { id: uid(), at: Date.now(), icon, text };
 }
@@ -369,7 +447,15 @@ export function reducer(state: GameState, action: Action): GameState {
       if (changed.length === 0) return state;
       const missions = state.missions.map((m) => (action.missionIds.includes(m.id) ? { ...m, released: action.released } : m));
       const logs = action.released ? changed.map((m) => entry('📯', `O xerife liberou a missão "${m.name}" para todos.`)) : [];
-      return withLog({ ...state, missions }, state.players, logs);
+      // Uma liberação vira um aviso só no sininho (liberar a área toda não manda 4 avisos).
+      const notices = action.released ? [releaseNotice(changed), ...(state.notices ?? [])].slice(0, MAX_NOTICES) : state.notices;
+      return withLog({ ...state, missions, notices }, state.players, logs);
+    }
+
+    case 'SEE_NOTICES': {
+      const player = state.players.find((p) => p.id === action.playerId);
+      if (!player || !unreadNotices(state, player).length) return state;
+      return { ...state, players: state.players.map((p) => (p.id === player.id ? { ...p, noticesSeenAt: Date.now() } : p)) };
     }
 
     case 'WIN_MISSION': {

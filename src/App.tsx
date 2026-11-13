@@ -3,6 +3,7 @@ import BadgesTab from './components/Badges';
 import InstallApp from './components/InstallApp';
 import Login from './components/Login';
 import MapView from './components/MapView';
+import NoticeBell from './components/NoticeBell';
 import Players from './components/Players';
 import Ranking from './components/Ranking';
 import SoundToggles from './components/SoundToggles';
@@ -45,8 +46,9 @@ function Game() {
       <header className="header no-print">
         <div className="userbar">
           <span>
-            {isAdmin ? '⭐ Gestão' : '🤠'} <b>{myPlayer?.codename ?? user.realName}</b> <span className="muted">({user.username})</span>
+            {isAdmin ? '⭐ Gestão' : '🤠'} <b>{myPlayer?.codename ?? user.realName}</b> <span className="muted user-login">({user.username})</span>
           </span>
+          {!isAdmin && <NoticeBell onOpenMap={() => setTab('mapa')} />}
           <SoundToggles />
           <InstallApp compact />
           <button className="btn small" onClick={logout}>

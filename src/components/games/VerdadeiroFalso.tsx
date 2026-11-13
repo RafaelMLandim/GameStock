@@ -3,23 +3,27 @@ import { TimeBar, shuffle, useCountdown, type GameProps } from './util';
 import { sfx } from '../../sound';
 
 /** Uma afirmação com o próprio relógio; responder ou estourar o tempo encerra a rodada. */
-function Statement({ text, seconds, onAnswer }: { text: string; seconds: number; onAnswer: (value: boolean | null) => void }) {
+function Statement({ text, correct, seconds, onAnswer }: { text: string; correct: boolean; seconds: number; onAnswer: (value: boolean | null) => void }) {
   const [done, setDone] = useState(false);
+  const [chosen, setChosen] = useState<boolean | null>(null);
   const answer = (v: boolean | null) => {
     if (done) return;
     setDone(true);
+    setChosen(v);
     onAnswer(v);
   };
+  // Depois de responder: a resposta certa fica verde e a escolha errada, vermelha (sem mexer no layout).
+  const mark = (v: boolean) => (!done ? '' : v === correct ? ' right' : v === chosen ? ' wrong' : ' dim');
   const { left } = useCountdown(seconds, !done, () => answer(null));
   return (
     <div className="vf-round">
       <TimeBar left={left} total={seconds} />
       <h3 className="quiz-question">“{text}”</h3>
       <div className="vf-buttons">
-        <button className="btn vf-true" disabled={done} onClick={() => answer(true)}>
+        <button className={`btn vf-true${mark(true)}`} disabled={done} onClick={() => answer(true)}>
           ✅ Verdadeiro
         </button>
-        <button className="btn vf-false" disabled={done} onClick={() => answer(false)}>
+        <button className={`btn vf-false${mark(false)}`} disabled={done} onClick={() => answer(false)}>
           ❌ Falso
         </button>
       </div>
@@ -48,12 +52,17 @@ export default function VerdadeiroFalso({ game, onFinish }: GameProps<'vf'>) {
   };
 
   return (
-    <div>
+    <div className="game-stage">
       <p className="game-hint">
         Afirmação {index + 1} de {list.length} · Acertos: {score}
       </p>
-      <Statement key={index} text={list[index].text} seconds={game.seconds} onAnswer={onAnswer} />
-      {feedback && <p className="game-feedback">{feedback}</p>}
+      <Statement key={index} text={list[index].text} correct={list[index].answer} seconds={game.seconds} onAnswer={onAnswer} />
+      {/* aviso flutuante por cima da afirmação: não empurra os botões */}
+      {feedback && (
+        <p className={`game-toast${feedback.startsWith('✅') ? ' good' : ' bad'}`} role="status">
+          {feedback}
+        </p>
+      )}
     </div>
   );
 }

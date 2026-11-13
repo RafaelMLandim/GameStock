@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { LAST_TERRITORY, TERRITORIES } from '../data';
 import { areaMissions, isLegend } from '../game';
 import { useGame } from '../GameContext';
+import { takeTerritoryRequest } from '../navigation';
 import AvatarFigure from './AvatarFigure';
 import TerritoryMissions from './Missions';
 import Place, { Cactus, Mesa } from './Places';
@@ -102,6 +103,17 @@ export default function MapView() {
   const phone = useIsPhone();
   const layout = phone ? TALL : WIDE;
   const hereRef = useRef<SVGGElement>(null);
+
+  // Um aviso do sininho pode pedir para abrir as missões de um território.
+  useEffect(() => {
+    const check = () => {
+      const t = takeTerritoryRequest();
+      if (t !== null) setOpenTerritory(t);
+    };
+    check();
+    window.addEventListener('open-territory', check);
+    return () => window.removeEventListener('open-territory', check);
+  }, []);
 
   // No celular o mapa é comprido: rola até onde o jogador está.
   useEffect(() => {

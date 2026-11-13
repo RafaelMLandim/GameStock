@@ -213,13 +213,16 @@ export default function Duelo({ game, onFinish }: GameProps<'duelo'>) {
         {/* a key faz o feixe animar de novo a cada rodada */}
         {shooter && <div key={`${wins}-${losses}`} className={`duel-beam from-${shooter}`} />}
       </div>
-      {(phase === 'ready' || phase === 'round') && wins < need && losses < need && (
-        <div className="game-feedback">
-          <button className="btn primary" onClick={start}>
-            🤠 Pronto{phase === 'round' ? ' para a próxima' : ''}
-          </button>
-        </div>
-      )}
+      {/* o botão só some de vista, para o palco não mudar de tamanho entre as rodadas */}
+      <div className="game-feedback">
+        <button
+          className="btn primary"
+          onClick={start}
+          style={{ visibility: (phase === 'ready' || phase === 'round') && wins < need && losses < need ? 'visible' : 'hidden' }}
+        >
+          🤠 Pronto{phase === 'round' ? ' para a próxima' : ''}
+        </button>
+      </div>
     </div>
   );
 }

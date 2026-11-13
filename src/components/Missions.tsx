@@ -6,6 +6,7 @@ import type { GameKind, Mission, MissionCategory } from '../types';
 import { GAME_INFO, PlayMission, contentToText, defaultGame, gameProblem, textToContent } from './games';
 import Place from './Places';
 import { Empty, PlayerSelect } from './shared';
+import GameIcon from './GameIcon';
 
 /** Quantas missões cada território deve ter. */
 export const MISSIONS_PER_AREA = 4;
@@ -211,6 +212,13 @@ export default function TerritoryMissions({ territory, onClose }: { territory: n
   const [open, setOpen] = useState<string | null>(null);
   const [editing, setEditing] = useState<Mission | null>(null);
   const [playing, setPlaying] = useState<{ mission: Mission; practice: boolean } | null>(null);
+  // Confirmação para a gestão de que os jogadores foram avisados no sininho.
+  const [sent, setSent] = useState('');
+  const release = async (ids: string[]) => {
+    const n = state.missions.filter((m) => ids.includes(m.id) && !m.released).length;
+    if (await dispatch({ type: 'SET_RELEASED', missionIds: ids, released: true }))
+      setSent(`🔔 ${n === 1 ? 'Missão liberada' : `${n} missões liberadas`}: os jogadores foram avisados no sininho.`);
+  };
   const t = TERRITORIES[territory];
   // Primeiro as missões obrigatórias da área, depois as extras.
   const missions = [...missionsAt(state, territory)].sort((a, b) => Number(b.territory === territory) - Number(a.territory === territory));
@@ -262,7 +270,7 @@ export default function TerritoryMissions({ territory, onClose }: { territory: n
             <button
               className="btn primary"
               disabled={locked.length === 0}
-              onClick={() => dispatch({ type: 'SET_RELEASED', missionIds: area.map((m) => m.id), released: true })}
+              onClick={() => release(area.map((m) => m.id))}
             >
               🔓 Liberar todas da área
             </button>
@@ -281,6 +289,11 @@ export default function TerritoryMissions({ territory, onClose }: { territory: n
             >
               ➕ Nova missão aqui
             </button>
+            {sent && (
+              <p className="notice-sent" role="status">
+                {sent}
+              </p>
+            )}
           </div>
         )}
         {editing && !state.missions.some((m) => m.id === editing.id) && (
@@ -305,13 +318,13 @@ export default function TerritoryMissions({ territory, onClose }: { territory: n
                 ) : (
                   <>
                     <div className="mission-head">
-                      <span className="mission-icon">{m.icon}</span>
+                      <span className="mission-icon"><GameIcon icon={m.icon} /></span>
                       <div>
                         <h3>{m.name}</h3>
                         <div className="muted">{m.description}</div>
                         <div>
                           <span className="badge">
-                            {info.icon} {info.label}
+                            <GameIcon icon={info.icon} /> {info.label}
                           </span>
                           <span className="badge gold">${m.reward}</span>
                           {bonus > 0 && <span className="badge gold">🎖️ +{bonus} ponto(s) pelos distintivos</span>}
@@ -332,7 +345,9 @@ export default function TerritoryMissions({ territory, onClose }: { territory: n
                         <>
                           <button
                             className={m.released ? 'btn' : 'btn primary'}
-                            onClick={() => dispatch({ type: 'SET_RELEASED', missionIds: [m.id], released: !m.released })}
+                            onClick={() =>
+                              m.released ? dispatch({ type: 'SET_RELEASED', missionIds: [m.id], released: false }) : release([m.id])
+                            }
                           >
                             {m.released ? '🔒 Bloquear' : '🔓 Liberar para todos'}
                           </button>

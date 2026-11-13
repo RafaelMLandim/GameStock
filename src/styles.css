@@ -648,6 +648,14 @@ input[type='checkbox'] {
   font-size: 36px;
 }
 
+/* Ícone desenhado (ex.: o revólver do duelo) no tamanho de um emoji. */
+.icon-svg {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.2em;
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -1175,6 +1183,70 @@ hr {
 .game-bad {
   color: var(--red);
   font-weight: bold;
+}
+
+/* Espaço do aviso reservado antes de responder (fica invisível). */
+.game-feedback.reserved {
+  visibility: hidden;
+}
+
+/* Aviso de certo/errado que flutua por cima do jogo, sem empurrar nada. */
+.game-stage {
+  position: relative;
+}
+
+.game-toast {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  z-index: 5;
+  width: max-content;
+  max-width: 90%;
+  margin: 0;
+  padding: 12px 20px;
+  border: 3px solid currentColor;
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: 0 8px 24px rgba(43, 26, 14, 0.35);
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  animation: toast-in 0.18s ease-out;
+  pointer-events: none;
+}
+
+.game-toast.good {
+  color: var(--green);
+}
+
+.game-toast.bad {
+  color: var(--red);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+}
+
+.vf-buttons .btn.right {
+  background: #e3f2dc;
+  border-color: var(--green);
+  color: var(--green);
+  opacity: 1;
+}
+
+.vf-buttons .btn.wrong {
+  background: #f6dcd5;
+  border-color: var(--red);
+  color: var(--red);
+  opacity: 1;
+}
+
+.vf-buttons .btn.dim {
+  opacity: 0.4;
 }
 
 .timebar {
@@ -3039,6 +3111,11 @@ button {
     flex-direction: column;
   }
 
+  /* no celular o aviso de certo/errado fica no espaço livre acima da afirmação */
+  .playing .game-toast {
+    top: 24%;
+  }
+
   .playing .vf-buttons .btn {
     padding: 30px 10px;
     font-size: 1.25rem;
@@ -3140,4 +3217,140 @@ button {
 .password-eye:hover,
 .password-eye[aria-pressed='true'] {
   color: var(--wood);
+}
+
+/* Sininho de avisos (jogador) */
+.btn.bell {
+  position: relative;
+  font-size: 16px;
+}
+
+.btn.bell .tab-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  margin: 0;
+}
+
+.modal.notices {
+  max-width: 520px;
+}
+
+.notices-empty {
+  margin: 12px 0 4px;
+}
+
+.notice-list {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.notice {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.notice.new {
+  border-color: var(--gold, #c9971c);
+  box-shadow: 0 0 0 3px rgba(201, 151, 28, 0.25);
+}
+
+.notice-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.notice p {
+  margin: 4px 0 8px;
+}
+
+.notice-when {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Gestão: confirmação de que o aviso foi enviado */
+.notice-sent {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  color: var(--green);
+  font-weight: bold;
+}
+
+.notice > div {
+  flex: 1;
+  text-align: left;
+}
+
+/* No celular a matrícula sai da barra do topo para o sininho e o "Sair" caberem numa linha. */
+@media (max-width: 700px) {
+  .userbar .user-login {
+    display: none;
+  }
+}
+
+/* Liga/desliga das notificações no celular, dentro do sininho */
+.push-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  text-align: left;
+}
+
+.push-switch > span {
+  flex: 1 1 220px;
+}
+
+.push-switch.ativo {
+  border-style: solid;
+  border-color: var(--green);
+}
+
+/* Convite para ligar as notificações (aparece ao entrar) */
+.modal.push-invite {
+  max-width: 420px;
+  margin-top: 12vh;
+  text-align: center;
+}
+
+.push-invite-icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.push-invite h2 {
+  margin: 8px 0;
+}
+
+.push-invite-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.push-invite-actions .btn {
+  padding: 12px;
+  font-size: 1.05rem;
+}
+
+.push-invite-steps {
+  margin: 8px 0 0;
+  padding-left: 22px;
+  text-align: left;
+}
+
+.push-invite-steps li {
+  margin: 6px 0;
 }
